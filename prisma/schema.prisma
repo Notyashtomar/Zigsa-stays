@@ -1,0 +1,128 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Property {
+  id           String   @id @default(cuid())
+  name         String
+  slug         String   @unique
+  tagline      String
+  description  String
+  address      String
+  city         String
+  state        String
+  pincode      String
+  latitude     Float
+  longitude    Float
+  plusCode     String?
+  phone1       String
+  phone2       String?
+  instagramUrl String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  roomTypes    RoomType[]
+  blockedDates BlockedDate[]
+  bookings     Booking[]
+}
+
+model RoomType {
+  id             String   @id @default(cuid())
+  propertyId     String
+  property       Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  name           String
+  slug           String   @unique
+  description    String
+  maxGuests      Int
+  inventoryCount Int
+  baseRateNight  Int
+  amenities      String   @default("[]")
+  isActive       Boolean  @default(true)
+  sortOrder      Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  blockedDates BlockedDate[]
+  bookings     Booking[]
+
+  @@index([propertyId])
+  @@index([isActive, sortOrder])
+}
+
+model BlockedDate {
+  id         String    @id @default(cuid())
+  propertyId String
+  property   Property  @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  roomTypeId String?
+  roomType   RoomType? @relation(fields: [roomTypeId], references: [id], onDelete: Cascade)
+  startDate  DateTime
+  endDate    DateTime
+  reason     String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([propertyId, startDate, endDate])
+  @@index([roomTypeId])
+}
+
+model Booking {
+  id                 String        @id @default(cuid())
+  confirmationCode   String        @unique
+  propertyId         String
+  property           Property      @relation(fields: [propertyId], references: [id])
+  roomTypeId         String
+  roomType           RoomType      @relation(fields: [roomTypeId], references: [id])
+  guestName          String
+  guestEmail         String
+  guestPhone         String
+  checkIn            DateTime
+  checkOut           DateTime
+  nights             Int
+  guests             Int
+  ratePerNight       Int
+  totalAmount        Int
+  currency           String        @default("INR")
+  status             BookingStatus @default(PENDING_PAYMENT)
+  notes              String?
+  expiresAt          DateTime?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  payment Payment?
+
+  @@index([propertyId])
+  @@index([roomTypeId])
+  @@index([status])
+  @@index([checkIn, checkOut])
+  @@index([guestEmail])
+}
+
+enum BookingStatus {
+  PENDING_PAYMENT
+  CONFIRMED
+  CANCELLED
+  EXPIRED
+}
+
+model Payment {
+  id                String   @id @default(cuid())
+  bookingId         String   @unique
+  booking           Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  provider          String   @default("razorpay")
+  razorpayOrderId   String?  @unique
+  razorpayPaymentId String?  @unique
+  razorpaySignature String?
+  amount            Int
+  currency          String   @default("INR")
+  status            String   @default("created")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([razorpayOrderId])
+  @@index([status])
+}

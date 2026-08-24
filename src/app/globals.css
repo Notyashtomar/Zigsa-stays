@@ -1,0 +1,88 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-forest-950: #0c1a14;
+  --color-forest-900: #12261d;
+  --color-forest-800: #1b3a2f;
+  --color-forest-700: #245240;
+  --color-forest-600: #2f6a50;
+  --color-forest-500: #3d7a52;
+  --color-wood-900: #3d2914;
+  --color-wood-700: #6b4423;
+  --color-wood-500: #a67c4a;
+  --color-wood-400: #c4a574;
+  --color-wood-300: #d4bc94;
+  --color-wood-200: #e8d5b0;
+  --color-cream-50: #fbf7f0;
+  --color-cream-100: #f6f0e6;
+  --color-cream-200: #ede4d4;
+  --color-cream-300: #e0d2ba;
+  --color-ink-900: #1a1612;
+  --color-ink-700: #3d3429;
+  --color-ink-600: #53483c;
+  --color-ink-500: #6b5e4e;
+  --color-sky-800: #2c3e5a;
+  --color-sky-600: #4a6fa5;
+  --color-sky-400: #7a9bc4;
+  --color-sky-200: #c5d4e8;
+  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-sans: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: #f6f0e6;
+  color: #1a1612;
+  font-family: var(--font-sans);
+}
+
+::selection {
+  background: #c4a574;
+  color: #1a1612;
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.paper-grain {
+  background-color: #f6f0e6;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -10%, #ede4d4, transparent),
+    radial-gradient(ellipse 40% 40% at 100% 0%, rgba(197, 212, 232, 0.35), transparent);
+}
+
+.paper-grain::before {
+  content: "";
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  opacity: 0.045;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.hero-sky {
+  background:
+    linear-gradient(180deg, rgba(12, 26, 20, 0.28) 0%, rgba(12, 26, 20, 0.55) 45%, #12261d 100%),
+    linear-gradient(180deg, #7a9bc4 0%, #c5d4e8 28%, #e8d5b0 58%, #1b3a2f 100%);
+}
+
+.field {
+  @apply w-full rounded-xl border border-wood-300/80 bg-cream-50 px-3.5 py-2.5 text-ink-900 shadow-sm outline-none transition focus:border-forest-600 focus:ring-2 focus:ring-forest-600/20;
+}
+
+.btn-primary {
+  @apply inline-flex items-center justify-center rounded-full bg-forest-800 px-5 py-2.5 text-sm font-semibold tracking-wide text-cream-50 transition hover:bg-forest-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest-600 disabled:cursor-not-allowed disabled:opacity-60;
+}
+
+.btn-secondary {
+  @apply inline-flex items-center justify-center rounded-full border border-wood-400/70 bg-cream-50 px-5 py-2.5 text-sm font-semibold text-forest-800 transition hover:border-forest-700 hover:bg-cream-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest-600;
+}
+
+.eyebrow {
+  @apply text-xs font-semibold uppercase tracking-[0.22em] text-wood-700;
+}
