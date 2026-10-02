@@ -1,5 +1,7 @@
+import { BookingStatus } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { sendBookingEmails } from "@/lib/email";
 import { prisma } from "@/lib/prisma";
 import { getRazorpay, razorpayConfigured } from "@/lib/razorpay";
 
@@ -7,8 +9,35 @@ const schema = z.object({
   bookingId: z.string().min(1),
 });
 
+// Without Razorpay keys the booking becomes a durable pay-at-property
+// reservation instead of a 15-minute hold that would silently expire.
+async function reservePayAtProperty(bookingId: string) {
+  const reserved = await prisma.booking.update({
+    where: { id: bookingId },
+    data: {
+      status: BookingStatus.CONFIRMED,
+      expiresAt: null,
+      payment: { update: { status: "pay_at_property" } },
+    },
+    include: { payment: true, roomType: true, property: true },
+  });
+
+  try {
+    await sendBookingEmails(reserved);
+  } catch (error) {
+    console.error("Email send skipped or failed", error);
+  }
+
+  return reserved;
+}
+
 export async function POST(request: Request) {
-  const { bookingId } = schema.parse(await request.json());
+  let bookingId: string;
+  try {
+    ({ bookingId } = schema.parse(await request.json()));
+  } catch {
+    return NextResponse.json({ error: "A booking id is required." }, { status: 400 });
+  }
   const booking = await prisma.booking.findUnique({
     where: { id: bookingId },
     include: { payment: true, roomType: true },
@@ -22,16 +51,24 @@ export async function POST(request: Request) {
   }
 
   if (!razorpayConfigured()) {
+    const reserved = await reservePayAtProperty(booking.id);
     return NextResponse.json({
       fallback: true,
-      confirmationCode: booking.confirmationCode,
-      amount: booking.totalAmount,
+      reserved: true,
+      confirmationCode: reserved.confirmationCode,
+      amount: reserved.totalAmount,
     });
   }
 
   const razorpay = getRazorpay();
   if (!razorpay) {
-    return NextResponse.json({ fallback: true, confirmationCode: booking.confirmationCode });
+    const reserved = await reservePayAtProperty(booking.id);
+    return NextResponse.json({
+      fallback: true,
+      reserved: true,
+      confirmationCode: reserved.confirmationCode,
+      amount: reserved.totalAmount,
+    });
   }
 
   const order = await razorpay.orders.create({

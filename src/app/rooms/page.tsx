@@ -3,6 +3,7 @@ import { Header } from "@/components/Header";
 import { PageHero } from "@/components/PageHero";
 import { RoomCard } from "@/components/RoomCard";
 import { getPrimaryProperty, serializeRoom } from "@/lib/booking";
+import { images } from "@/lib/images";
 
 export const dynamic = "force-dynamic";
 
@@ -16,11 +17,12 @@ export default async function RoomsPage() {
 
   return (
     <>
-      <Header />
+      <Header overlay />
       <PageHero
-        eyebrow="Named room types"
+        eyebrow="Accommodations"
         title="Three ways to sleep on the hill."
-        lede="Rates and inventory below are placeholders the owner can edit in admin. What will not change: quiet rooms, a kitchen downstairs, and a road that does not dump you onto Mall Road at midnight."
+        lede="Wood-panelled rooms, windows that earn their keep, and a kitchen downstairs. Rates below are editable by the desk — the quiet is not."
+        image={images.roomValley}
       />
       <main className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
         <div className="grid gap-6 md:grid-cols-3">

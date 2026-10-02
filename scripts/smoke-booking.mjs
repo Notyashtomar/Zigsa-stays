@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
-const base = process.env.SMOKE_URL || "http://localhost:3002";
+const base = process.env.SMOKE_URL || "http://localhost:3000";
 
 function ymd(offset) {
   const date = new Date();

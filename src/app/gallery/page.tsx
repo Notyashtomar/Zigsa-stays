@@ -1,40 +1,40 @@
+import Image from "next/image";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
-import { RoomIllustration } from "@/components/MountainScene";
 import { PageHero } from "@/components/PageHero";
+import { galleryFrames, images } from "@/lib/images";
 import { site } from "@/lib/site";
 
 export const metadata = {
   title: "Gallery",
 };
 
-const frames = [
-  { title: "Valley morning", caption: "West-facing light over the Beas side of the hill.", variant: "valley" as const },
-  { title: "Cabin and pines", caption: "The mark on the sign — wood, forest, snow line.", variant: "deluxe" as const },
-  { title: "After Hadimba", caption: "Boots by the door, tea before dinner.", variant: "family" as const },
-  { title: "Kanyal Road dusk", caption: "The quiet way home from Rangri.", variant: "default" as const },
-  { title: "Café table", caption: "A plate and a second cup — photo still to come.", variant: "deluxe" as const },
-  { title: "Restaurant evening", caption: "Guests mention the kitchen. We will show it properly soon.", variant: "family" as const },
-  { title: "Village waterfall", caption: "A short walk from Simsa, not a postcard invent.", variant: "valley" as const },
-  { title: "Winter ridge", caption: "Snow on the Dhauladhar when the road allows.", variant: "default" as const },
-  { title: "Suite sitting room", caption: "Family suite placeholder — replace with a real frame.", variant: "family" as const },
-];
-
 export default function GalleryPage() {
   return (
     <>
-      <Header />
+      <Header overlay />
       <PageHero
-        eyebrow="Photographs in progress"
-        title="The hill is real. These frames are waiting."
-        lede={`We do not have a full photo set on this site yet. Follow ${site.instagramHandle} for current rooms and weather, and treat the grid below as honest placeholders — not stock mountains from another valley.`}
+        eyebrow="The hillside"
+        title="Wood, weather, and the valley doing its work."
+        lede={`An art-directed look at the stay. For this week's rooms and weather as they actually are, ${site.instagramHandle} is the ground truth.`}
+        image={images.terrace}
       />
       <main className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {frames.map((frame) => (
-            <figure key={frame.title} className="overflow-hidden rounded-3xl border border-wood-300/70 bg-cream-50">
-              <div className="h-44">
-                <RoomIllustration variant={frame.variant} />
+        <div className="columns-1 gap-5 sm:columns-2 lg:columns-3 [&>figure]:mb-5">
+          {galleryFrames.map((frame) => (
+            <figure
+              key={frame.title}
+              className="break-inside-avoid overflow-hidden rounded-[1.5rem] bg-cream-50 ring-1 ring-wood-300/50"
+            >
+              <div className={`relative w-full ${frame.tall ? "aspect-[3/4]" : "aspect-[4/3]"}`}>
+                <Image
+                  src={frame.src}
+                  alt={frame.alt}
+                  fill
+                  placeholder="blur"
+                  sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                  className="object-cover"
+                />
               </div>
               <figcaption className="p-4">
                 <p className="font-display text-xl text-forest-900">{frame.title}</p>

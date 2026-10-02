@@ -2,6 +2,7 @@ import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { PageHero } from "@/components/PageHero";
 import { WhatsAppLink } from "@/components/WhatsAppLink";
+import { images } from "@/lib/images";
 import { mapsEmbedSrc, mapsOpenSrc, site, telHref } from "@/lib/site";
 
 export const metadata = {
@@ -11,11 +12,12 @@ export const metadata = {
 export default function LocationPage() {
   return (
     <>
-      <Header />
+      <Header overlay />
       <PageHero
         eyebrow="Simsa · Rangri · Kanyal Road"
         title="West of the Beas, two kilometres from the noise."
         lede={site.setting}
+        image={images.hero}
       />
       <main className="mx-auto max-w-6xl space-y-12 px-4 py-16 sm:px-6">
         <div className="overflow-hidden rounded-3xl border border-wood-300/70 bg-cream-50">

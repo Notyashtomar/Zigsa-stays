@@ -61,9 +61,9 @@ Events: `payment.captured`, `order.paid`
 
 - Price = nights × room type rate (stored in paise)
 - Overlap check uses `inventoryCount` on each room type
-- `PENDING_PAYMENT` holds expire after 15 minutes
-- Webhook or checkout verify marks the stay `CONFIRMED`
-- Admin can confirm pay-at-property bookings or cancel
+- With Razorpay keys: `PENDING_PAYMENT` holds expire after 15 minutes; webhook or checkout verify marks the stay `CONFIRMED`
+- Without Razorpay keys: bookings complete as pay-at-property reservations (`CONFIRMED`, payment marked `pay_at_property`) — no expiry
+- Admin can cancel any booking to free inventory, or confirm a stuck hold
 - Admin can block dates for one room type or the whole property
 
 ## Not in v1

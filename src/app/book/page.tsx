@@ -5,6 +5,8 @@ import { Header } from "@/components/Header";
 import { PageHero } from "@/components/PageHero";
 import { getPrimaryProperty, serializeRoom } from "@/lib/booking";
 import { toDateInput } from "@/lib/dates";
+import { images } from "@/lib/images";
+import { razorpayConfigured } from "@/lib/razorpay";
 
 export const dynamic = "force-dynamic";
 
@@ -23,14 +25,20 @@ export default async function BookPage({
   const checkIn = query.checkIn || toDateInput(addDays(new Date(), 1));
   const checkOut = query.checkOut || toDateInput(addDays(new Date(), 3));
   const guests = Number(query.guests) || 2;
+  const paymentsConfigured = razorpayConfigured();
 
   return (
     <>
-      <Header />
+      <Header overlay />
       <PageHero
         eyebrow="Direct booking"
-        title="Hold the room, then pay."
-        lede="Night-count pricing, named room types, and a 15-minute hold while you pay with UPI or card. If Razorpay keys are not on this server yet, we still take the request — confirm on WhatsApp or at the desk."
+        title={paymentsConfigured ? "Hold the room, then pay." : "Reserve now, settle on the hill."}
+        lede={
+          paymentsConfigured
+            ? "Night-count pricing, named room types, and a 15-minute hold while you pay with UPI or card."
+            : "Night-count pricing and named room types. Online payment is not switched on for this server yet, so the room is reserved in your name — pay at the property or confirm on WhatsApp."
+        }
+        image={images.roomDeluxe}
       />
       <main className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
         <BookForm
@@ -39,6 +47,7 @@ export default async function BookPage({
           initialCheckOut={checkOut}
           initialGuests={guests}
           initialRoomSlug={query.room}
+          paymentsConfigured={paymentsConfigured}
         />
       </main>
       <Footer />

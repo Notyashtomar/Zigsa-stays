@@ -23,9 +23,11 @@ export default async function ConfirmPage({
   const booking = code
     ? await prisma.booking.findUnique({
         where: { confirmationCode: code.toUpperCase() },
-        include: { roomType: true },
+        include: { roomType: true, payment: true },
       })
     : null;
+
+  const payAtProperty = booking?.payment?.status === "pay_at_property";
 
   const tone =
     booking?.status === "CONFIRMED" || status === "paid"
@@ -36,14 +38,18 @@ export default async function ConfirmPage({
 
   const title =
     tone === "success"
-      ? "You are on the hill."
+      ? payAtProperty
+        ? "The room is reserved."
+        : "You are on the hill."
       : tone === "failed"
         ? "Payment did not finish."
         : "We are holding the room.";
 
   const lede =
     tone === "success"
-      ? "The stay is confirmed. Bring a warm layer — Simsa evenings drop faster than Mall Road."
+      ? payAtProperty
+        ? "Your reservation is locked in — no payment taken online. Settle at the property when you arrive, or message the desk on WhatsApp if plans change. Bring a warm layer either way."
+        : "The stay is confirmed. Bring a warm layer — Simsa evenings drop faster than Mall Road."
       : tone === "failed"
         ? "The hold may still be open for a few minutes. Try again, or message us and pay at the property."
         : "Unpaid holds expire in about 15 minutes. WhatsApp the desk if you would rather settle on arrival.";
@@ -52,7 +58,15 @@ export default async function ConfirmPage({
     <>
       <Header />
       <main className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
-        <p className="eyebrow">{tone === "success" ? "Confirmed" : tone === "failed" ? "Not completed" : "Pending payment"}</p>
+        <p className="eyebrow">
+          {tone === "success"
+            ? payAtProperty
+              ? "Reserved — pay at property"
+              : "Confirmed"
+            : tone === "failed"
+              ? "Not completed"
+              : "Pending payment"}
+        </p>
         <h1 className="font-display mt-3 text-4xl text-forest-900">{title}</h1>
         <p className="mt-4 text-ink-700">{lede}</p>
 
@@ -84,6 +98,16 @@ export default async function ConfirmPage({
             <div className="flex justify-between gap-4">
               <dt className="text-ink-500">Total</dt>
               <dd className="font-semibold">{formatINR(booking.totalAmount)}</dd>
+            </div>
+            <div className="flex justify-between gap-4">
+              <dt className="text-ink-500">Payment</dt>
+              <dd>
+                {payAtProperty
+                  ? "At the property"
+                  : booking.payment?.status === "paid"
+                    ? "Paid online"
+                    : "Pending"}
+              </dd>
             </div>
           </dl>
         ) : (

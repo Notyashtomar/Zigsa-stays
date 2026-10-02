@@ -17,6 +17,7 @@ type BookingRow = {
   totalAmount: number;
   status: string;
   roomType: { name: string };
+  payment: { status: string } | null;
 };
 
 export default function AdminBookingsPage() {
@@ -49,7 +50,8 @@ export default function AdminBookingsPage() {
         <p className="eyebrow">Calendar as a list</p>
         <h1 className="font-display mt-2 text-4xl text-forest-900">Bookings</h1>
         <p className="mt-2 text-sm text-ink-600">
-          Mark pay-at-property stays confirmed. Cancel to free inventory. Unpaid holds expire after 15 minutes.
+          Pay-at-property reservations arrive confirmed — collect on arrival, cancel to free inventory. Unpaid online
+          holds expire after 15 minutes.
         </p>
       </div>
       <div className="overflow-x-auto rounded-2xl border border-wood-300/60 bg-cream-50">
@@ -83,7 +85,16 @@ export default function AdminBookingsPage() {
                   {booking.roomType.name}
                   <span className="block text-xs text-ink-500">{booking.guests} guests</span>
                 </td>
-                <td className="px-4 py-3">{formatINR(booking.totalAmount)}</td>
+                <td className="px-4 py-3">
+                  {formatINR(booking.totalAmount)}
+                  <span className="block text-xs text-ink-500">
+                    {booking.payment?.status === "pay_at_property"
+                      ? "pay at property"
+                      : booking.payment?.status === "paid"
+                        ? "paid online"
+                        : "unpaid"}
+                  </span>
+                </td>
                 <td className="px-4 py-3">
                   <span
                     className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide ${

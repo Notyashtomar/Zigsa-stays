@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Logo } from "@/components/Logo";
 
 const links = [
@@ -15,11 +15,28 @@ const links = [
 export function Header({ overlay = false }: { overlay?: boolean }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const onDark = overlay && !open;
+
+  useEffect(() => {
+    if (!overlay) return;
+    const onScroll = () => setScrolled(window.scrollY > 32);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [overlay]);
 
   return (
     <header
-      className={`z-40 w-full ${overlay ? "absolute inset-x-0 top-0" : "sticky top-0 border-b border-wood-300/50 bg-cream-100/90 backdrop-blur"}`}
+      className={`z-40 w-full ${
+        overlay
+          ? `fixed inset-x-0 top-0 transition-all duration-500 ${
+              scrolled
+                ? "border-b border-cream-50/10 bg-forest-950/85 shadow-[0_10px_40px_rgba(12,26,20,0.35)] backdrop-blur-md"
+                : "bg-transparent"
+            }`
+          : "sticky top-0 border-b border-wood-300/50 bg-cream-100/90 backdrop-blur"
+      }`}
     >
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
         <Link href="/" aria-label="Zigsa Stays home" className="shrink-0">

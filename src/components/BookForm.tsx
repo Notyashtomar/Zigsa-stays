@@ -34,12 +34,14 @@ export function BookForm({
   initialCheckOut,
   initialGuests,
   initialRoomSlug,
+  paymentsConfigured = false,
 }: {
   rooms: PublicRoom[];
   initialCheckIn: string;
   initialCheckOut: string;
   initialGuests: number;
   initialRoomSlug?: string;
+  paymentsConfigured?: boolean;
 }) {
   const router = useRouter();
   const firstRoom = rooms.find((room) => room.slug === initialRoomSlug) ?? rooms[0];
@@ -126,7 +128,9 @@ export function BookForm({
       }).then(async (response) => response.json());
 
       if (order.fallback || !order.orderId) {
-        router.push(`/book/confirm?code=${created.confirmationCode}&status=pending`);
+        router.push(
+          `/book/confirm?code=${created.confirmationCode}&status=${order.reserved ? "reserved" : "pending"}`,
+        );
         return;
       }
 
@@ -263,15 +267,27 @@ export function BookForm({
         </dl>
         {error ? <p className="rounded-xl bg-cream-50/10 px-3 py-2 text-sm text-wood-300">{error}</p> : null}
         <button type="submit" className="btn-primary w-full bg-wood-400 text-forest-950 hover:bg-wood-300" disabled={busy || nights < 1}>
-          {busy ? "Holding your room…" : "Pay with UPI or card"}
+          {busy ? "Holding your room…" : paymentsConfigured ? "Pay with UPI or card" : "Reserve — pay at the property"}
         </button>
-        <p className="text-xs leading-relaxed text-cream-200/70">
-          Razorpay opens when test or live keys are set. Otherwise we hold the room for 15 minutes and you can confirm on{" "}
-          <a className="underline" href={whatsappHref("Hello Zigsa Stays, I would like to book a stay.")}>
-            WhatsApp
-          </a>{" "}
-          or pay at the property.
-        </p>
+        {paymentsConfigured ? (
+          <p className="text-xs leading-relaxed text-cream-200/70">
+            Razorpay opens for UPI or card. We hold the room for 15 minutes while you pay — if the payment does not go
+            through, message us on{" "}
+            <a className="underline" href={whatsappHref("Hello Zigsa Stays, I would like to book a stay.")}>
+              WhatsApp
+            </a>{" "}
+            and we will sort it at the desk.
+          </p>
+        ) : (
+          <p className="text-xs leading-relaxed text-cream-200/70">
+            Online payment is not switched on for this server yet, so the room is reserved in your name straight away.
+            Settle at the property when you arrive, or confirm sooner on{" "}
+            <a className="underline" href={whatsappHref("Hello Zigsa Stays, I would like to book a stay.")}>
+              WhatsApp
+            </a>
+            .
+          </p>
+        )}
       </aside>
     </form>
   );
